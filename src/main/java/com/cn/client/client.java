@@ -208,5 +208,8 @@ public class client extends wallet {
         return str;
     }
 
+    public void reset(){
+        
+    }
 
 }

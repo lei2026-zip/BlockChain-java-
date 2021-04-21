@@ -156,8 +156,8 @@ public class transtion implements Cloneable{
 
         //构建交易
         transtion tx = new transtion();
-        tx.setInputs((txinput[])txInputs.toArray());
-        tx.setOutputs((txoutput[])txOutputs.toArray());
+        tx.setInputs((txinput[])txInputs.toArray(txinput[]::new));
+        tx.setOutputs((txoutput[])txOutputs.toArray(txoutput[]::new));
         tx.nonce = System.nanoTime();
         //序列化hash
         tx.setTxHash(tx.CalculateTxHash());

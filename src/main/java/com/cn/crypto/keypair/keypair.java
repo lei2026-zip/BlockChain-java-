@@ -11,7 +11,6 @@ import java.security.spec.X509EncodedKeySpec;
 public class keypair {
     private String PubK;
     private String PriK;
-    private KeyPair Key;
 
     private static final String SIGNALGORITHMS = "SHA256withECDSA";
     private static final String ALGORITHM = "EC";
@@ -26,19 +25,18 @@ public class keypair {
             ECGenParameterSpec ecSpec = new ECGenParameterSpec(SECP256K1);
             java.security.KeyPairGenerator kf =  KeyPairGenerator.getInstance(ALGORITHM);
             kf.initialize(ecSpec, new SecureRandom());
-            KeyPair keyPair = kf.generateKeyPair();
+            KeyPair keyPai = kf.generateKeyPair();
             keypair key = new keypair();
-            key.Key = keyPair;
-            key.PubK =  hexUtil.encodeHexString(keyPair.getPublic().getEncoded());
-            key.PriK =  hexUtil.encodeHexString(keyPair.getPrivate().getEncoded());
+            key.PubK =  hexUtil.encodeHexString(keyPai.getPublic().getEncoded());
+            key.PriK =  hexUtil.encodeHexString(keyPai.getPrivate().getEncoded());
             return key;
     }
 
 
     //私钥签名
-    public String signature(byte[] date) throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+    public String signature(byte[] date) throws Exception {
         Signature sig = Signature.getInstance("ECDH", "BC");
-        sig.initSign(this.Key.getPrivate(), new SecureRandom());
+        sig.initSign(getPrivateKey(this.PriK), new SecureRandom());
         sig.sign(date,0,date.length);
         return "";
     }
@@ -134,14 +132,6 @@ public class keypair {
 
     public void setPriK(String priK) {
         PriK = priK;
-    }
-
-    public KeyPair getKey() {
-        return Key;
-    }
-
-    public void setKey(KeyPair key) {
-        Key = key;
     }
 
     // PriK *ecdsa.PrivateKey
