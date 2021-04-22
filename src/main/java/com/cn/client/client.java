@@ -166,6 +166,9 @@ public class client extends wallet {
         String err = null;
         try {
             err = this.SendTransaction(result.get("from"),result.get("to"),result.get("value"));
+            if(err!=null){
+                return err;
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return err + "\n err:"+e.toString();

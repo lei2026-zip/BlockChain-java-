@@ -8,6 +8,7 @@ import com.cn.uitls.serialize;
 
 import java.lang.reflect.Array;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.ArrayList;
 
 import com.cn.crypto.keypair.keypair;
@@ -22,16 +23,17 @@ public class transtion implements Cloneable{
     /**
      * 使用私钥对某个交易进行交易的签名
      */
-    public void Sign(PrivateKey prik, utxo[] utxos) throws CloneNotSupportedException {
+    public void Sign(PrivateKey prik) throws CloneNotSupportedException {
 
         if(this.IsCoinbaseTransaction()){
             return;
         }
 
-        ////交易的交易输入的个数与utxo的个数需要一致
-        //if len(tx.Inputs) != len(utxos) {
-        //	return errors.New("签名遇到错误，请重试")
-        //}
+//        ////交易的交易输入的个数与utxo的个数需要一致
+//        if((this.inputs.length) != utxos.length){
+//            console.Println("签名遇到错误，请重试");
+//        	return ;
+//        }
         //拷贝交易，复制交易对象
         transtion txCopy = (transtion) this.clone();
 
@@ -39,60 +41,55 @@ public class transtion implements Cloneable{
         for(int i = 0; i < txCopy.inputs.length;i++){
             txinput input = txCopy.inputs[i]; //当前遍历到的第几个交易输入
 
-            utxo utxo = utxos[i]; //当前遍历到的第几个utxo
             //scirptPub := utxo.PubHash //获得当前遍历到的utxo的锁定脚本中的公钥哈希
-            input.setPubk(utxo.getPubkhash());
-
-            String txHash = txCopy.CalculateTxHash();
-
-            input.setPubk(null);
-
+            input.setSig(null);
+            String inputHash = hash.sum(serialize.Serialize(input), hash.HashType.SHA256);
+//            input.setPubk(null);
             //签名过程 big.Int -> []byte
 
-
-            this.inputs[i].setSig(keypair.signECDSA(prik,txHash)); //赋值的是原tx对象
+            this.inputs[i].setSig(keypair.signECDSA(prik,inputHash)); //赋值的是原tx对象
         }
     }
 
     /**
      * 对交易进行签名验证
      */
-    public Boolean VertifySign( utxo[] utxos) throws CloneNotSupportedException {
+    public Boolean VertifySign(PublicKey pubk) throws CloneNotSupportedException {
 
         if(this.IsCoinbaseTransaction()){
             return true;
         }
 
-        //消费构建的input与所引用的utxo的个数不匹配，直接返回false
-        if(this.inputs.length != utxos.length){
-            console.Println("消费构建的input与所引用的utxo的个数不匹配");
-            return false;
-        }
+//        //消费构建的input与所引用的utxo的个数不匹配，直接返回false
+//        if(this.inputs.length != utxos.length){
+//            console.Println("消费构建的input与所引用的utxo的个数不匹配");
+//            return false;
+//        }
 
         transtion txCopy =  (transtion) this.clone();
 
         Boolean result = false;
         //对交易的每一个交易输入进行签名验证
         for(int i=0;i<txCopy.inputs.length;i++){
-
             //签名验证：公钥、签名、原文->hash
-            String pubk = txCopy.inputs[i].getPubk();     //公钥
+//            String pubk = txCopy.inputs[i].getPubk();     //公钥
             String signBytes = txCopy.inputs[i].getSig(); //签名
-
+            console.Println("Vpubk:"+pubk);
             //对交易副本中的每一个input进行还原，还原签名之前的状态
             //① 签名置空
             txCopy.inputs[i].setSig(null);
             //② pubk设置为所引用的utxo的pubkhash字段
-            txCopy.inputs[i].setPubk(utxos[i].getPubkhash());
             //hash
-            String txCopyHash = txCopy.CalculateTxHash();
-
+            String inputHash = hash.sum(serialize.Serialize(txCopy.inputs[i]), hash.HashType.SHA256);
+            console.Println("VerifHash:"+inputHash);
+//            txCopy.inputs[i].setPubk(null);
             try {
                 if(pubk==null){
                     console.Println("pubk is null !");
                     return false;
                 }
-                result = keypair.verifyECDSA(keypair.getPublicKey(pubk),signBytes, txCopyHash);
+                console.Println(pubk);
+                result = keypair.verifyECDSA(pubk,signBytes, inputHash);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -113,7 +110,8 @@ public class transtion implements Cloneable{
      * 计算交易的哈希，并将哈希值返回
      */
     public String CalculateTxHash(){
-        String txhash = hash.sum(serialize.Serialize(this), hash.HashType.SHA256);
+        String str =  serialize.Serialize(this);
+        String txhash = hash.sum(str, hash.HashType.SHA256);
         return txhash;
     }
 

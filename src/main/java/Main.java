@@ -39,18 +39,18 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
 //      Client.queryAllkeypair();
 //       Client.ParseArgs("newaddress",null);
 //       Client.del();
 //       console.Println(Client.Chain.LastHash);
 //         String str =  Client.ParseArgs("getallblocks",null);
 //      String str =  Client.ParseArgs("generategensis","{\"address\":\"2CAHSf4iSVEPrTbmmGacSvW1qPYjbg3kvAjtyVdZdiATdMQXkm8M5saaypM7oX\"}");
-//       String str =  Client.ParseArgs("sendtransaction","{\"from\":\"2CAHSf4iSVEPrTbmmGacSvW1qPYjbg3kvAjtyVdZdiATdMQXkm8M5saaypM7oX\",\"to\":\"2C9xop5KpWJ7RLoQd6wGjUMPSiXeZtQmSkxgbX14bQ1cE1k9HQM2x5VaCSRamg\",\"value\":\"4\"}");
+//         String str =  Client.ParseArgs("sendtransaction","{\"from\":\"2CAHSf4iSVEPrTbmmGacSvW1qPYjbg3kvAjtyVdZdiATdMQXkm8M5saaypM7oX\",\"to\":\"2C9xop5KpWJ7RLoQd6wGjUMPSiXeZtQmSkxgbX14bQ1cE1k9HQM2x5VaCSRamg\",\"value\":\"0.1\"}");
 //       String str =  Client.ParseArgs("sendtransaction","{\"from\":\"2C9xop5KpWJ7RLoQd6wGjUMPSiXeZtQmSkxgbX14bQ1cE1k9HQM2x5VaCSRamg\",\"to\":\"2CAHSf4iSVEPrTbmmGacSvW1qPYjbg3kvAjtyVdZdiATdMQXkm8M5saaypM7oX\",\"value\":\"9\"}");
-       String str =  Client.ParseArgs("getallblocks",null);
-//         String str =  Client.ParseArgs("getbalance","2CAHSf4iSVEPrTbmmGacSvW1qPYjbg3kvAjtyVdZdiATdMQXkm8M5saaypM7oX");
-         console.Println(str);
+//       String str =  Client.ParseArgs("getallblocks",null);
+//        console.Println(str);
+         String str2 =  Client.ParseArgs("getbalance","2CAHSf4iSVEPrTbmmGacSvW1qPYjbg3kvAjtyVdZdiATdMQXkm8M5saaypM7oX");
+         console.Println(str2);
     }
 }
 

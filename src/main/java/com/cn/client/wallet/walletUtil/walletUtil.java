@@ -101,9 +101,9 @@ public class walletUtil {
             transtion tx = transtion.NewTransaction((utxo[]) uts.toArray(utxo[]::new), fromSlice,toSlice,this.Address.get(fromSlice).getPubK(), valueSlice);
 
             //私钥签名
-            tx.Sign(keypair.getPrivateKey(this.Address.get(fromSlice).getPriK()),(utxo[]) uts.toArray(utxo[]::new));
+            tx.Sign(keypair.getPrivateKey(this.Address.get(fromSlice).getPriK()));
             //接收方公钥验签
-            boolean vertif = tx.VertifySign((utxo[]) uts.toArray(utxo[]::new));
+            boolean vertif = tx.VertifySign(keypair.getPublicKey(this.Address.get(fromSlice).getPubK()));
             if(!vertif){
                   console.Println("Vertif is false !");
                   return "Vertif is false !";
@@ -257,6 +257,7 @@ public class walletUtil {
              for(int i=0;i<utxos.length;i++) {
                    balance +=utxos[i].getValue();
              }
+             console.Printf("%f\r\n",balance);
              return balance;
        }
        /**
@@ -330,7 +331,7 @@ public class walletUtil {
               this.IteratorBlock = null;
               this.Chain.LastHash = null;
               this.Chain.DelKeyFromRides(blockchain.LASTHASH);
-              return "delete is successed";
+              return "delete is successed.";
         }
 
       public powblock getIteratorBlock() {
