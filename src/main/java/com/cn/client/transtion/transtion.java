@@ -138,7 +138,7 @@ public class transtion implements Cloneable{
              input.setPubk(pubk);
              input.setTxid(utxos[i].getTxid());
              input.setVout(utxos[i].getVout());
-            //把构建好的交易输入放入到交易输入容器中
+             //把构建好的交易输入放入到交易输入容器中
              txInputs.add(input);
         }
         //交易输出切片;

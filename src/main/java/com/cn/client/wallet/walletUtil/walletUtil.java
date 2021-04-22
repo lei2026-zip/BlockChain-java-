@@ -35,7 +35,13 @@ public class walletUtil {
             transtion coinbase = transtion.NewCoinBaseTx(addr,value);
 
             String baseStr = serialize.Serialize(coinbase);
-            powblock block = new powblock(this.LastBlock.getHeight()+1,this.LastBlock.getHash(),null);
+            console.Println("base::"+baseStr);
+            powblock block;
+            if(this.LastBlock==null){
+                  block = new powblock(0,"00000000000000000000000000000000",null);
+            }else{
+                  block = new powblock(this.LastBlock.getHeight()+1,this.LastBlock.getHash(),null);
+            }
             block.setHash(block.sumBlockHash());   //nonce 暂时为0
             block.setDate(baseStr);
             this.Chain.AddNewBlockToDB(block);
@@ -67,31 +73,32 @@ public class walletUtil {
             }
 
             //遍历参数的切片，创建交易
-            ArrayList<transtion> txs = new ArrayList<transtion>();  //此处为缓冲多个交易
+            transtion txs = new transtion();
 //            for(int index = 0; index < lenFrom; index++){
             ArrayList<utxo> utxos = this.GetUTXOsWithBalance(fromSlice,null);  //第二个参数同步其他还未上链的交易,防止重复花费同一个output
             if(utxos==null){
                   return "utxos is null";
             }
             double frombalance = SumbalancebyUtxo(utxos.toArray(utxo[]::new));
-            console.Println(frombalance);
             if(frombalance < valueSlice){
                  return "抱歉，" + fromSlice + "余额不足，请充值！";
             }
-            console.Printf("转账发起人%s,当前余额：%f,接收者:%s,转账数额：%f,剩余: %f\r\n", fromSlice,frombalance, toSlice, valueSlice,frombalance-valueSlice);
+            console.Printf("\n转账发起人%s\n当前余额：%f\n接收者:%s\n转账数额：%f\n剩余: %f\r\n", fromSlice,frombalance, toSlice, valueSlice,frombalance-valueSlice);
             double inputAmount = 0; //总的花费的钱数
+
 
             ArrayList<utxo> uts = new ArrayList<utxo>();
             for(int i=0;i<utxos.size();i++){
                   inputAmount += utxos.get(i).getValue();
+                  uts.add(utxos.get(i));
                   if(inputAmount >= valueSlice){
                         //够花了
-                        uts.add(utxos.get(i));
                         break;
                   }
+
             }
 
-            transtion tx = transtion.NewTransaction((utxo[]) uts.toArray(utxos.toArray(utxo[]::new)), fromSlice,toSlice,this.Address.get(fromSlice).getPubK(), valueSlice);
+            transtion tx = transtion.NewTransaction((utxo[]) uts.toArray(utxo[]::new), fromSlice,toSlice,this.Address.get(fromSlice).getPubK(), valueSlice);
 
             //私钥签名
             tx.Sign(keypair.getPrivateKey(this.Address.get(fromSlice).getPriK()),(utxo[]) uts.toArray(utxo[]::new));
@@ -101,11 +108,10 @@ public class walletUtil {
                   console.Println("Vertif is false !");
                   return "Vertif is false !";
             }
-            txs.add(tx);
 //            }
-            String txsstr = serialize.Serialize(txs);
+            String txsstr = serialize.Serialize(tx);
             powblock block;
-            if(this.Chain.LastHash==null){
+            if(this.getLastBlock()==null){
                   block = new powblock(0,txsstr);
                   block.setHash(block.sumBlockHash());
             }else{
@@ -137,9 +143,14 @@ public class walletUtil {
               //判断IteratorBlock是否为空的
               if(this.IteratorBlock == null){
                     currentBlockstr = this.Chain.GetDateByKeyFromRides(lasthash);
+                    if(currentBlockstr==null){
+                          console.Println("currectblockstr is null");
+                          return false;
+                    }
               }else{
                     String hash = this.IteratorBlock.getPerHash();
-                    if(hash.compareTo("00000000000000000000000000000000")<1){
+                    console.Println(hash);
+                    if(hash==null||hash.compareTo("00000000000000000000000000000000")<=1){
                           this.IteratorBlock.setHash(null);
                           return false;
                     }
@@ -161,7 +172,7 @@ public class walletUtil {
               this.IteratorBlock = null;
               //使用迭代器进行区块的遍历
               while(this.BlockNext()){ //遍历区块
-                    console.Println(this.IteratorBlock.getHeight());
+                    console.Println("blockheight:"+this.IteratorBlock.getHeight());
                     transtion Txs;
                     Txs =  serialize.Deserialize(this.IteratorBlock.getDate(),transtion.class);
                     if(Txs==null){
@@ -170,13 +181,23 @@ public class walletUtil {
 //                    for(int i=0;i<Txs.length;i++){ //遍历区块的交易
                           //a、遍历交易输入
                     for(int j=0;j<Txs.inputs.length;j++) {
+//                          console.Println("compare:");
+//                          console.Println(Txs.inputs[j].getPubk());
+//                          console.Println("from:"+from);
+//                          console.Println(this.Address.get(from).getPriK());
+                          if(Txs.inputs[j]==null){
+                                Txs.inputs = null;
+                                break;
+                          }
                           if (Txs.inputs[j].getPubk().compareTo(this.Address.get(from).getPubK()) != 0) {
                                 continue;
                           }
+
                           //该交易输入是from的，即from花钱了
                           spends.add(Txs.inputs[j]);
 //                          }
                     }
+//                    console.Println("spent:"+spends.size());
                     //b、遍历交易输出
                     for(int k=0;k<Txs.outputs.length;k++){
                           if (!Txs.outputs[k].VertifyOutputWithAddress(from)){
@@ -201,9 +222,11 @@ public class walletUtil {
                     isInComeSpend = false;
                     console.Println("OUTX txid:"+inComes.get(i).getTxid());
                     console.Println("OUTX value:"+inComes.get(i).getValue());
-                    for(int j=0;j<spends.size();j++){ //5
+                    console.Println("OUTX Vout:"+inComes.get(i).getVout());
+                    for(int j=0;j<spends.size();j++){ //
                           console.Println("spent txid:"+spends.get(j).getTxid());
-                          if(inComes.get(i).getTxid() == spends.get(j).getTxid() && inComes.get(i).getVout() == spends.get(j).getVout()){
+                          console.Println("spent Vout:"+spends.get(j).getVout());
+                          if((inComes.get(i).getTxid().equals(spends.get(j).getTxid()))&&(inComes.get(i).getVout() == spends.get(j).getVout())){
                                 //spends =  append(spends[:index],spends[index+1:]...)//防止一个输入标记多个输出
                                 isInComeSpend = true;
                                 break;
@@ -292,10 +315,23 @@ public class walletUtil {
                      }
               }
               //把内存中的产生的收入放入到可花的utxo中
+              console.Println(utxos.size());
               utxos.addAll(memInComes);
               return utxos;
         }
-
+        public String del() throws Exception {
+              this.IteratorBlock = null;
+              //使用迭代器进行区块的遍历
+              while(this.BlockNext()) { //遍历区块
+                    console.Println("deleted block height:"+this.IteratorBlock.getHeight());
+                    this.Chain.DelKeyFromRides( this.IteratorBlock.getHash());
+              }
+              this.LastBlock = null;
+              this.IteratorBlock = null;
+              this.Chain.LastHash = null;
+              this.Chain.DelKeyFromRides(blockchain.LASTHASH);
+              return "delete is successed";
+        }
 
       public powblock getIteratorBlock() {
             return IteratorBlock;

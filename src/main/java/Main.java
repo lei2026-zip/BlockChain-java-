@@ -28,7 +28,7 @@ import static com.cn.crypto.keypair.keypair.*;
 //2C9xop5KpWJ7RLoQd6wGjUMPSiXeZtQmSkxgbX14bQ1cE1k9HQM2x5VaCSRamg
 public class Main {
     private static Boolean runflag = true;
-    public static void main(String[] args){
+    public static void main(String[] args) throws Exception {
         client  Client = new client();
         try {
             String err =  Client.init();
@@ -40,14 +40,17 @@ public class Main {
             e.printStackTrace();
         }
 
-//       Client.Chain.getJedis().del(Client.USERKEY);
-//        generategensis
-//       Client.queryAllkeypair();
-//        Client.ParseArgs("newaddress",null);
-//        String str =  Client.ParseArgs("sendtransaction","{\"from\":\"2CBbKQkSiAmeBJ7SW3Md7WMxpLZa3Zb5LrvZKhZnsfueF2ZevABJC8pZhEKTCU\",\"to\":\"2CCdDf6aHr5abfkPKSqbP95hWBSryKPEzMFS8Niq52ySRfmzvDcsU2hNTt6E5n\",\"value\":\"9.9\"}");
-//        String str =  Client.ParseArgs("getallblocks",null);
-//        String str =  Client.ParseArgs("getbalance","2CBbKQkSiAmeBJ7SW3Md7WMxpLZa3Zb5LrvZKhZnsfueF2ZevABJC8pZhEKTCU");
-//        console.Println(str);
+//      Client.queryAllkeypair();
+//       Client.ParseArgs("newaddress",null);
+//       Client.del();
+//       console.Println(Client.Chain.LastHash);
+//         String str =  Client.ParseArgs("getallblocks",null);
+//      String str =  Client.ParseArgs("generategensis","{\"address\":\"2CAHSf4iSVEPrTbmmGacSvW1qPYjbg3kvAjtyVdZdiATdMQXkm8M5saaypM7oX\"}");
+//       String str =  Client.ParseArgs("sendtransaction","{\"from\":\"2CAHSf4iSVEPrTbmmGacSvW1qPYjbg3kvAjtyVdZdiATdMQXkm8M5saaypM7oX\",\"to\":\"2C9xop5KpWJ7RLoQd6wGjUMPSiXeZtQmSkxgbX14bQ1cE1k9HQM2x5VaCSRamg\",\"value\":\"4\"}");
+//       String str =  Client.ParseArgs("sendtransaction","{\"from\":\"2C9xop5KpWJ7RLoQd6wGjUMPSiXeZtQmSkxgbX14bQ1cE1k9HQM2x5VaCSRamg\",\"to\":\"2CAHSf4iSVEPrTbmmGacSvW1qPYjbg3kvAjtyVdZdiATdMQXkm8M5saaypM7oX\",\"value\":\"9\"}");
+       String str =  Client.ParseArgs("getallblocks",null);
+//         String str =  Client.ParseArgs("getbalance","2CAHSf4iSVEPrTbmmGacSvW1qPYjbg3kvAjtyVdZdiATdMQXkm8M5saaypM7oX");
+         console.Println(str);
     }
 }
 

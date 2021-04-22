@@ -45,7 +45,7 @@ public class client extends wallet {
                     return this.SendTransaction(args);
                 case commid.GETBALANCE: //获取地址的余额功能
                     try {
-                        return String.valueOf(this.GetBalance(args));
+                        return String.valueOf(this.GetBalance(args));   //有精度问题 比如 80.2 结果会是79.1999999999  暂未解决
                     } catch (Exception e) {
                         e.printStackTrace();
                         return "getbalance is error:"+e.toString();
@@ -61,11 +61,12 @@ public class client extends wallet {
                 case commid.HELP:
                     return this.Help();
                 case commid.RESET:
-//                    err :=	C.Chain.ClearBlockChainFromDB();
-//                    if err!=nil{
-//                    return "",err
-//                }
-                return "reset is successed!";
+                    try {
+                        return this.del();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return "delete is error:"+e.toString();
+                    }
                 default:
                     return this.Default();
             }
@@ -106,7 +107,7 @@ public class client extends wallet {
         }else{
             console.Println("getblock is susseccced !");
         }
-        return  serialize.Serialize(blocks.toArray());
+        return  serialize.Serialize(blocks.toArray(powblock[]::new));
     }
 
     public String GetLastBlock(){
@@ -170,7 +171,7 @@ public class client extends wallet {
             return err + "\n err:"+e.toString();
         }
         console.Println("SendTransaction is successed.");
-        return "SendTransaction is successed.";
+        return "\nSendTransaction is successed.";
     }
 
     public String GenerateGensis(String str){
@@ -208,6 +209,7 @@ public class client extends wallet {
         return str;
     }
 
+    //迭代删除所有区块
     public void reset(){
         
     }

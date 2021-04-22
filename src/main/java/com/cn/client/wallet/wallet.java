@@ -39,7 +39,6 @@ public class wallet extends walletUtil {
         //=============================
         //此处反序列化会出现数据不匹配的情况,目前进行序列化再json解析来解决
         keys = serialize.Deserialize(date, keys.getClass());
-        console.Println("reload:"+date);
         Map<String,keypair> keys1 = new HashMap<String, keypair>();
         for(String key : keys.keySet()){
 
